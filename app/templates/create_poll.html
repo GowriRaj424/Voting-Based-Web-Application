@@ -1,0 +1,149 @@
+{% extends "base.html" %} {% block title %}Create Poll{% endblock %} {% block
+content %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
+    <title>Create Poll</title>
+
+    <!-- Bootstrap 5 CDN -->
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+
+    <!-- Custom Styles -->
+    <style>
+      /* Background Image */
+      body {
+        background-image: url("{{ url_for('static', filename='img/background.jpg') }}");
+        background-size: cover;
+        background-position: center;
+        background-attachment: fixed;
+        background-repeat: no-repeat;
+      }
+
+      /* Center the Form */
+      .auth-form-wrap {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+      }
+
+      .auth-form {
+        background-color: rgba(
+          255,
+          255,
+          255,
+          0.9
+        ); /* Slight transparency for the form */
+        border-radius: 10px;
+        padding: 40px 30px;
+        width: 100%;
+        max-width: 500px;
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+      }
+
+      .form-group {
+        margin-bottom: 1rem;
+      }
+
+      .btn-primary {
+        background-color: #007bff !important;
+        border-color: #007bff !important;
+      }
+
+      .brand-img {
+        width: 100px;
+        height: auto;
+      }
+    </style>
+  </head>
+
+  <body>
+    <!-- Main Content -->
+    <div class="auth-form-wrap">
+      <div class="auth-form">
+        <h2 class="text-center mb-4">Create a New Poll</h2>
+
+        <!-- Poll Creation Form -->
+        <form action="{{ url_for('routes.create_poll') }}" method="POST">
+          <!-- Poll Title -->
+          <div class="form-group">
+            <label for="title" class="form-label">Poll Title</label>
+            <input
+              type="text"
+              class="form-control"
+              id="title"
+              name="title"
+              required
+            />
+          </div>
+
+          <!-- Start Date -->
+          <div class="form-group">
+            <label for="start_date" class="form-label">Start Date</label>
+            <input
+              type="date"
+              class="form-control"
+              id="start_date"
+              name="start_date"
+              required
+            />
+          </div>
+
+          <!-- End Date -->
+          <div class="form-group">
+            <label for="end_date" class="form-label">End Date</label>
+            <input
+              type="date"
+              class="form-control"
+              id="end_date"
+              name="end_date"
+              required
+            />
+          </div>
+
+          <!-- Poll Status -->
+          <div class="form-group">
+            <label for="status" class="form-label">Poll Status</label>
+            <select class="form-select" id="status" name="status" required>
+              <option value="active">Active</option>
+              <option value="closed">Closed</option>
+            </select>
+          </div>
+
+          <!-- Poll Options -->
+          <div class="form-group">
+            <label for="options" class="form-label"
+              >Poll Options (comma-separated)</label
+            >
+            <input
+              type="text"
+              class="form-control"
+              id="options"
+              name="options"
+              required
+              placeholder="Option1, Option2, Option3"
+            />
+          </div>
+
+          <!-- Submit Button -->
+          <button type="submit" class="btn btn-primary btn-block">
+            Create Poll
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Bootstrap and jQuery -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+  </body>
+</html>
+{% endblock %}

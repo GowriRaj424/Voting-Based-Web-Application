@@ -1,0 +1,25 @@
+{% extends "base.html" %} {% block title %}Vote for Poll - {{ poll.title }}{%
+endblock %} {% block content %}
+<h2>{{ poll.title }}</h2>
+
+<p>Vote for one of the following options:</p>
+<form action="{{ url_for('routes.vote', poll_id=poll.id) }}" method="POST">
+  {% for option in options %}
+  <div class="form-check">
+    <input
+      class="form-check-input"
+      type="radio"
+      name="option"
+      id="option{{ option.id }}"
+      value="{{ option.id }}"
+      required
+    />
+    <label class="form-check-label" for="option{{ option.id }}">
+      {{ option.option }}
+    </label>
+  </div>
+  {% endfor %}
+  <br />
+  <button type="submit" class="btn btn-primary">Submit Vote</button>
+</form>
+{% endblock %}

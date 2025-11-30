@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
+    <title>User Dashboard - Voting / Poll Management</title>
+
+    <!-- Bootstrap CSS (Using CDN) -->
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+    />
+
+    <!-- Custom CSS -->
+    <style>
+      body {
+        background-color: #f8f9fa;
+        font-family: "Arial", sans-serif;
+      }
+      .navbar {
+        background-color: #343a40 !important;
+      }
+      .navbar-brand {
+        color: #ffffff !important;
+        font-weight: bold;
+      }
+      .dashboard-header {
+        padding: 20px;
+        text-align: center;
+      }
+      .poll-table {
+        margin-top: 20px;
+      }
+      .footer {
+        background-color: #343a40;
+        color: #ffffff;
+        padding: 10px 0;
+        text-align: center;
+      }
+    </style>
+  </head>
+
+  <body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark">
+      <div class="container-fluid">
+        <a class="navbar-brand" href="#">Voting / Poll Management</a>
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item">
+            <a class="nav-link" href="{{ url_for('routes.user_dashboard') }}"
+              >Dashboard</a
+            >
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{{ url_for('routes.logout') }}">Logout</a>
+          </li>
+        </ul>
+      </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container my-5">
+      <div class="dashboard-header">
+        <h1>Welcome, {{ current_user.ssn }}!</h1>
+        <p>Explore active polls and review results of completed polls.</p>
+      </div>
+      <!-- Active Polls Section -->
+      <div class="card mb-4">
+        <div class="card-header bg-primary text-white">
+          <h5>Active Polls</h5>
+        </div>
+        <div class="card-body">
+          {% if active_polls|length > 0 %}
+          <table class="table table-hover table-bordered poll-table">
+            <thead class="table-dark">
+              <tr>
+                <th>#</th>
+                <th>Poll Title</th>
+                <th>Start Date</th>
+                <th>End Date</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for poll in active_polls %}
+              <tr>
+                <td>{{ loop.index }}</td>
+                <td>{{ poll.title }}</td>
+                <td>{{ poll.start_date.strftime('%B %d, %Y') }}</td>
+                <td>{{ poll.end_date.strftime('%B %d, %Y') }}</td>
+                <td>
+                  <a
+                    href="{{ url_for('routes.vote', poll_id=poll.id) }}"
+                    class="btn btn-primary btn-sm"
+                  >
+                    <i class="fas fa-vote-yea"></i> Vote
+                  </a>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+          {% else %}
+          <p class="text-center">No active polls available at the moment.</p>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- Completed Polls Section -->
+      <div class="card">
+        <div class="card-header bg-secondary text-white">
+          <h5>Completed Polls</h5>
+        </div>
+        <div class="card-body">
+          {% if completed_polls|length > 0 %}
+          <table class="table table-hover table-bordered poll-table">
+            <thead class="table-dark">
+              <tr>
+                <th>#</th>
+                <th>Poll Title</th>
+                <th>Start Date</th>
+                <th>End Date</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for poll in completed_polls %}
+              <tr>
+                <td>{{ loop.index }}</td>
+                <td>{{ poll.title }}</td>
+                <td>{{ poll.start_date.strftime('%B %d, %Y') }}</td>
+                <td>{{ poll.end_date.strftime('%B %d, %Y') }}</td>
+                <td>
+                  <a
+                    href="{{ url_for('routes.results', poll_id=poll.id) }}"
+                    class="btn btn-info btn-sm"
+                  >
+                    <i class="fas fa-chart-bar"></i> View Results
+                  </a>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+          {% else %}
+          <p class="text-center">No completed polls available at the moment.</p>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+      <p>© 2024 Voting / Poll Management</p>
+    </footer>
+
+    <!-- Bootstrap JS (Using CDN) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  </body>
+</html>

@@ -1,0 +1,150 @@
+{% extends "base.html" %}
+
+{% block title %}Results for Poll - {{ poll.title }}{% endblock %}
+
+{% block content %}
+
+<!-- Add some styles for the results page -->
+<style>
+    .stat-card {
+        background-color: #f4f6f9;
+        border-radius: 8px;
+        padding: 20px;
+        text-align: center;
+        color: #333;
+        margin-bottom: 20px;
+    }
+
+    .stat-card h4 {
+        font-size: 18px;
+        font-weight: bold;
+    }
+
+    .stat-card p {
+        font-size: 24px;
+        font-weight: bold;
+        color: #007bff;
+    }
+
+    .table-wrap {
+        overflow-x: auto;
+    }
+</style>
+
+<!-- Poll Results Header -->
+<h1 class="text-center my-4">{{ poll.title }} - Results</h1>
+
+<div class="container">
+    <!-- Row for summary statistics -->
+    <div class="row">
+        <div class="col-md-3">
+            <div class="stat-card">
+                <h4>Total Votes</h4>
+                <p>{{ total_votes }}</p>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card">
+                <h4>Active Users</h4>
+                <p>{{ active_users }}</p>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card">
+                <h4>Winning Votes</h4>
+                <p class="text-success">{{ winning_votes }}</p>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card">
+                <h4>Winning Candidate</h4>
+                <p class="text-success">{{ winning_candidate }}</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Chart for Poll Results -->
+    <div class="card mt-4">
+        <div class="card-header">
+            <h2>Poll Results (Chart)</h2>
+        </div>
+        <div class="card-body">
+            <div id="e_chart_11" class="echart" style="height: 300px;"></div>
+        </div>
+    </div>
+
+    <!-- Results Table -->
+    <div class="card mt-4">
+        <div class="card-header">
+            <h2>Detailed Poll Results</h2>
+        </div>
+
+        <div class="table-wrap">
+            <table class="table table-bordered mb-0">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Candidate Name</th>
+                        <th>Live Vote Count</th>
+                        <th>Total Votes</th>
+                        <th>Poll End Time</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for result in results %}
+                    <tr>
+                        <td>{{ loop.index }}</td> <!-- Use loop.index instead of enumerate -->
+                        <td>{{ result.candidate_name }}</td>
+                        <td class="text-{{ 'green' if result.live_votes >= 0 else 'red' }} font-weight-600">
+                            {{ '+' if result.live_votes > 0 else '' }}{{ result.live_votes }}
+                        </td>
+                        <td>{{ result.total_votes }}</td>
+                        <td>{{ result.poll_end_time.strftime('%B %d, %Y') }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Include Chart Script -->
+<script src="https://cdn.jsdelivr.net/npm/echarts/dist/echarts.min.js"></script>
+<script>
+    var chartData = {{ chart_data | safe }}; // Pass chart data to JS safely
+
+    var chart = echarts.init(document.getElementById('e_chart_11'));
+
+    var option = {
+        title: {
+            text: 'Poll Results',
+            left: 'center'
+        },
+        tooltip: {
+            trigger: 'item'
+        },
+        legend: {
+            orient: 'horizontal',
+            bottom: '10%'
+        },
+        series: [
+            {
+                name: 'Votes',
+                type: 'pie',
+                radius: '50%',
+                data: chartData,
+                emphasis: {
+                    itemStyle: {
+                        shadowBlur: 10,
+                        shadowOffsetX: 0,
+                        shadowColor: 'rgba(0, 0, 0, 0.5)'
+                    }
+                }
+            }
+        ]
+    };
+
+    chart.setOption(option);
+</script>
+
+{% endblock %}

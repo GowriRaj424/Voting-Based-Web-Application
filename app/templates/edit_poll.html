@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Poll - {{ poll.title }}{% endblock %}
+
+{% block content %}
+<h2>Edit Poll: {{ poll.title }}</h2>
+
+<form action="{{ url_for('routes.edit_poll', poll_id=poll.id) }}" method="POST">
+    <div class="mb-3">
+        <label for="title" class="form-label">Poll Title</label>
+        <input type="text" class="form-control" id="title" name="title" value="{{ poll.title }}" required>
+    </div>
+    <div class="mb-3">
+        <label for="start_date" class="form-label">Start Date</label>
+        <input type="date" class="form-control" id="start_date" name="start_date" value="{{ poll.start_date.strftime('%Y-%m-%d') }}" required>
+    </div>
+    <div class="mb-3">
+        <label for="end_date" class="form-label">End Date</label>
+        <input type="date" class="form-control" id="end_date" name="end_date" value="{{ poll.end_date.strftime('%Y-%m-%d') }}" required>
+    </div>
+    <div class="mb-3">
+        <label for="status" class="form-label">Poll Status</label>
+        <select class="form-select" id="status" name="status" required>
+            <option value="active" {% if poll.status == 'active' %}selected{% endif %}>Active</option>
+            <option value="closed" {% if poll.status == 'closed' %}selected{% endif %}>Closed</option>
+        </select>
+    </div>
+    <button type="submit" class="btn btn-primary">Update Poll</button>
+</form>
+
+<a href="{{ url_for('routes.delete_poll', poll_id=poll.id) }}" class="btn btn-danger mt-3" onclick="return confirm('Are you sure you want to delete this poll?');">Delete Poll</a>
+{% endblock %}

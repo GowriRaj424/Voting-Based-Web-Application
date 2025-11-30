@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block title %}Poll - {{ poll.title }}{% endblock %}
+
+{% block content %}
+<h2>{{ poll.title }}</h2>
+<p>Poll ends on: {{ poll.end_date }}</p>
+
+{% if poll.options|length == 0 %}
+    <p>No options available for this poll. Please contact the admin to add options.</p>
+{% else %}
+    <form action="{{ url_for('routes.vote', poll_id=poll.id) }}" method="POST">
+        {% for option in poll.options %}
+            <div>
+                <input type="radio" id="option{{ option.id }}" name="option" value="{{ option.id }}" required>
+                <label for="option{{ option.id }}">{{ option.option }}</label>
+            </div>
+        {% endfor %}
+        <button type="submit">Vote</button>
+    </form>
+{% endif %}
+
+{% endblock %}

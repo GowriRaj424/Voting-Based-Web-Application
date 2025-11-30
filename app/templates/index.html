@@ -1,0 +1,52 @@
+<!-- templates/index.html -->
+{% extends 'base.html' %}
+
+{% block title %}Voting / Poll Management{% endblock %}
+
+{% block content %}
+<style>
+  body {
+    background-image: url("{{ url_for('static', filename='img/background.jpg') }}");
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    background-repeat: no-repeat;
+  }
+
+  /* Style for text */
+  h2, p {
+    color: white; /* Make text white */
+    text-align: center; /* Center the text */
+  }
+
+  .content {
+    text-align: center;
+    color: white;
+    padding: 20px;
+    background-color: rgba(0, 0, 0, 0.5); /* Add a semi-transparent black background to make the text more readable */
+    border-radius: 10px;
+  }
+</style>
+
+<div class="content">
+  <h2>Welcome to the Voting / Poll Management</h2>
+  <p>
+    This is the home page where users can sign up, log in, and participate in
+    polls.
+  </p>
+  <div>
+    {% if current_user.is_authenticated %}
+    <p>
+      Hello, {{ current_user.username }}! You can
+      <a href="{{ url_for('routes.logout') }}" style="color: white;">logout</a>.
+    </p>
+    {% else %}
+    <p>
+      Please <a href="{{ url_for('routes.login') }}" style="color: white;">login</a> or
+      <a href="{{ url_for('routes.signup') }}" style="color: white;">sign up</a>.
+    </p>
+    {% endif %}
+  </div>
+</div>
+
+{% endblock %}

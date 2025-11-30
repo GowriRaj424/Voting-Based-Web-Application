@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block title %}Add Voting{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h2>Add Voting</h2>
+    <form action="#" method="POST">
+        <div class="form-group">
+            <label>Select Poll</label>
+            <select class="form-control" name="poll_id">
+                <option value="1">Poll 1</option>
+                <option value="2">Poll 2</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>Option</label>
+            <input type="text" class="form-control" name="option">
+        </div>
+        <button type="submit" class="btn btn-primary">Vote</button>
+    </form>
+</div>
+{% endblock %}
