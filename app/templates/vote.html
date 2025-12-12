@@ -3,7 +3,9 @@ endblock %} {% block content %}
 <h2>{{ poll.title }}</h2>
 
 <p>Vote for one of the following options:</p>
-<form action="{{ url_for('routes.vote', poll_id=poll.id) }}" method="POST">
+<form action="{{ url_for('routes.vote', poll_id=poll.id) }}" method="POST" autocomplete="off"
+>
+  {{ csrf_token() }}
   {% for option in options %}
   <div class="form-check">
     <input
@@ -15,7 +17,8 @@ endblock %} {% block content %}
       required
     />
     <label class="form-check-label" for="option{{ option.id }}">
-      {{ option.option }}
+      {{ option.option | e }}
+
     </label>
   </div>
   {% endfor %}

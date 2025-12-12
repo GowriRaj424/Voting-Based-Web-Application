@@ -58,7 +58,8 @@
         <div class="col-md-3">
             <div class="stat-card">
                 <h4>Winning Candidate</h4>
-                <p class="text-success">{{ winning_candidate }}</p>
+                <p class="text-success">{{ winning_candidate | e }}</p>
+                
             </div>
         </div>
     </div>
@@ -94,12 +95,14 @@
                     {% for result in results %}
                     <tr>
                         <td>{{ loop.index }}</td> <!-- Use loop.index instead of enumerate -->
-                        <td>{{ result.candidate_name }}</td>
+                        <td>{{ result.candidate_name | e }}</td>
+
                         <td class="text-{{ 'green' if result.live_votes >= 0 else 'red' }} font-weight-600">
                             {{ '+' if result.live_votes > 0 else '' }}{{ result.live_votes }}
                         </td>
                         <td>{{ result.total_votes }}</td>
-                        <td>{{ result.poll_end_time.strftime('%B %d, %Y') }}</td>
+                        <td>{{ result.poll_end_time.strftime('%B %d, %Y') | e }}</td>
+
                     </tr>
                     {% endfor %}
                 </tbody>
