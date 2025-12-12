@@ -75,7 +75,11 @@ content %}
         </p>
 
         <!-- Signup Form -->
-        <form action="{{ url_for('routes.signup') }}" method="POST">
+        <form
+          action="{{ url_for('routes.signup') }}"
+          method="POST"
+          autocomplete="off"
+        >
           {{ csrf_token() }}
 
           <div class="form-group mb-3">
@@ -114,7 +118,9 @@ content %}
                 placeholder="Password"
                 type="password"
                 required
+                minlength="8"
               />
+
               <div class="input-group-append">
                 <span class="input-group-text"
                   ><i

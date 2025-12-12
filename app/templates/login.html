@@ -65,12 +65,22 @@
         </p>
 
         <!-- Login Form -->
-        <form action="{{ url_for('routes.login') }}" method="POST">
+        <form action="{{ url_for('routes.login') }}" method="POST" autocomplete="off">
+          
+          {{ csrf_token() }}
           <div class="form-group mb-3">
             <label for="ssn" class="form-label">Social Security Number</label>
-            <input type="text" class="form-control" id="ssn" name="ssn" placeholder="XXX-XX-XXXX" required>
-        </div>
-        
+            <input
+              type="text"
+              class="form-control"
+              id="ssn"
+              name="ssn"
+              placeholder="XXX-XX-XXXX"
+              required
+              pattern="^\d{3}-\d{2}-\d{4}$"
+              title="Enter SSN in format XXX-XX-XXXX"
+            />
+          </div>
 
           <!-- Password Field -->
           <div class="form-group mb-3">
@@ -82,7 +92,9 @@
                 placeholder="Password"
                 type="password"
                 required
+                minlength="8"
               />
+
               <div class="input-group-append">
                 <span class="input-group-text"
                   ><i
