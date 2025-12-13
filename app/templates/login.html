@@ -3,7 +3,6 @@
 {% block title %}Login{% endblock %}
 
 {% block content %}
-
 <style>
   body {
     background-image: url("{{ url_for('static', filename='img/background.jpg') }}");
@@ -14,43 +13,64 @@
   }
 
   .auth-form-wrap {
+    min-height: 90vh;
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 100vh;
   }
 
   .auth-form {
-    background: #ffffff;
-    border-radius: 10px;
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
-    padding: 40px 30px;
+    background: rgba(255, 255, 255, 0.97);
+    border-radius: 14px;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+    padding: 45px 40px;
     width: 100%;
-    max-width: 400px;
+    max-width: 420px;
+  }
+
+  .auth-form h1 {
+    font-size: 2.2rem;
+    font-weight: 600;
+  }
+
+  .auth-form p {
+    color: #6c757d;
+  }
+
+  .form-control {
+    border-radius: 8px;
+  }
+
+  .input-group-text {
+    cursor: pointer;
+    background: #f8f9fa;
   }
 
   .btn-primary {
-    background-color: #007bff !important;
-    border-color: #007bff !important;
+    border-radius: 8px;
+    padding: 10px;
+    font-weight: 500;
   }
 </style>
 
 <div class="auth-form-wrap">
   <div class="auth-form">
-    <h1 class="display-5 text-center mb-3">Welcome Back</h1>
+
+    <h1 class="text-center mb-2">Welcome Back</h1>
     <p class="text-center mb-4">
-      Sign in to your account and enjoy unlimited perks.
+      Sign in to continue to the voting system
     </p>
 
-    <!-- Login Form -->
     <form action="{{ url_for('routes.login') }}" method="POST" autocomplete="off">
 
-      <!-- CSRF Token (hidden, not visible) -->
+      <!-- CSRF Token -->
       <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
       <!-- SSN -->
       <div class="mb-3">
-        <label for="ssn" class="form-label">Social Security Number</label>
+        <label for="ssn" class="form-label fw-semibold">
+          Social Security Number
+        </label>
         <input
           type="text"
           class="form-control"
@@ -59,12 +79,14 @@
           placeholder="XXX-XX-XXXX"
           required
           pattern="^\d{3}-\d{2}-\d{4}$"
-          title="Enter SSN in format XXX-XX-XXXX">
+          title="Format: XXX-XX-XXXX">
       </div>
 
       <!-- Password -->
-      <div class="mb-3">
-        <label for="password" class="form-label">Password</label>
+      <div class="mb-4">
+        <label for="password" class="form-label fw-semibold">
+          Password
+        </label>
         <div class="input-group">
           <input
             type="password"
@@ -74,19 +96,22 @@
             required
             minlength="8">
 
-          <span class="input-group-text" onclick="togglePassword()" style="cursor:pointer;">
+          <span class="input-group-text" onclick="togglePassword()">
             <i class="fa fa-eye-slash toggle-password"></i>
           </span>
         </div>
       </div>
 
       <!-- Submit -->
-      <button type="submit" class="btn btn-primary w-100">Login</button>
+      <button type="submit" class="btn btn-primary w-100">
+        Login
+      </button>
 
-      <p class="text-center mt-3">
+      <p class="text-center mt-4 mb-0">
         Don’t have an account?
         <a href="{{ url_for('routes.signup') }}">Sign Up</a>
       </p>
+
     </form>
   </div>
 </div>
@@ -105,5 +130,4 @@ function togglePassword() {
   }
 }
 </script>
-
 {% endblock %}

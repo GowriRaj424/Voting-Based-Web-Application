@@ -1,9 +1,5 @@
-<!-- templates/index.html -->
-{% extends 'base.html' %}
-
-{% block title %}Voting / Poll Management{% endblock %}
-
-{% block content %}
+{% extends "base.html" %} {% block title %}Voting / Poll Management{% endblock
+%} {% block content %}
 <style>
   body {
     background-image: url("{{ url_for('static', filename='img/background.jpg') }}");
@@ -13,38 +9,62 @@
     background-repeat: no-repeat;
   }
 
-  /* Style for text */
-  h2, p {
-    color: white; /* Make text white */
-    text-align: center; /* Center the text */
+  .home-wrapper {
+    min-height: 85vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 
-  .content {
+  .home-card {
+    background: rgba(0, 0, 0, 0.65);
+    color: #ffffff;
+    padding: 45px 55px;
+    border-radius: 14px;
+    max-width: 750px;
     text-align: center;
-    color: white;
-    padding: 20px;
-    background-color: rgba(0, 0, 0, 0.5); /* Add a semi-transparent black background to make the text more readable */
-    border-radius: 10px;
+    box-shadow: 0 12px 35px rgba(0, 0, 0, 0.45);
+  }
+
+  .home-card h1 {
+    font-size: 2.6rem;
+    font-weight: 600;
+    margin-bottom: 20px;
+  }
+
+  .home-card p {
+    font-size: 1.15rem;
+    line-height: 1.7;
+    margin-bottom: 30px;
+  }
+
+  .home-actions a {
+    min-width: 130px;
   }
 </style>
 
-<div class="content">
-  <h2>Welcome to the Voting / Poll Management</h2>
-  <p>
-    This is the home page where users can sign up, log in, and participate in
-    polls.
-  </p>
-  <div>
-    {% if current_user.is_authenticated %}
+<div class="home-wrapper">
+  <div class="home-card">
+    <h1>Voting & Poll Management System</h1>
+
     <p>
-      Hello, {{ current_user.username }}! You can
-      <a href="{{ url_for('routes.logout') }}" style="color: white;">logout</a>.
+      A secure web-based platform that enables authenticated users to
+      participate in polls, while administrators can create, manage, and analyse
+      voting results in a controlled and secure environment.
     </p>
-    {% else %}
-    <p>
-      Please <a href="{{ url_for('routes.login') }}" style="color: white;">login</a> or
-      <a href="{{ url_for('routes.signup') }}" style="color: white;">sign up</a>.
-    </p>
+
+    {% if not current_user.is_authenticated %}
+    <div class="home-actions d-flex justify-content-center gap-3">
+      <a
+        href="{{ url_for('routes.login') }}"
+        class="btn btn-outline-light btn-lg"
+      >
+        Login
+      </a>
+      <a href="{{ url_for('routes.signup') }}" class="btn btn-primary btn-lg">
+        Sign Up
+      </a>
+    </div>
     {% endif %}
   </div>
 </div>

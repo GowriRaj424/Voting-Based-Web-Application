@@ -1,7 +1,6 @@
 {% extends "base.html" %} {% block title %}Admin Dashboard{% endblock %} {%
 block content %}
 
-<!-- Add some styles for the dashboard -->
 <style>
   .stat-card {
     background-color: #f4f6f9;
@@ -24,24 +23,25 @@ block content %}
   }
 </style>
 
-<!-- Admin Dashboard Header -->
 <h1 class="text-center my-4">Admin Dashboard</h1>
 
 <div class="container">
-  <!-- Row for summary statistics -->
+  <!-- Summary Cards -->
   <div class="row">
     <div class="col-md-3">
       <div class="stat-card">
         <h4>Total Polls</h4>
-        <p>{{ total_polls | e}}</p>
+        <p>{{ total_polls }}</p>
       </div>
     </div>
+
     <div class="col-md-3">
       <div class="stat-card">
         <h4>Active Polls</h4>
         <p>{{ active_polls }}</p>
       </div>
     </div>
+
     <div class="col-md-3">
       <div class="stat-card">
         <h4>Total Users</h4>
@@ -49,15 +49,14 @@ block content %}
       </div>
     </div>
   </div>
-  <!-- Table for Polls -->
+
+  <!-- Polls Table -->
   <div class="card mt-4">
-    <div class="card-header">
-      <h2>All Polls</h2>
-      <a
-        href="{{ url_for('routes.create_poll') }}"
-        class="btn btn-primary float-right"
-        >Create New Poll</a
-      >
+    <div class="card-header d-flex justify-content-between align-items-center">
+      <h2 class="mb-0">All Polls</h2>
+      <a href="{{ url_for('routes.create_poll') }}" class="btn btn-primary">
+        Create New Poll
+      </a>
     </div>
 
     <div class="card-body">
@@ -72,6 +71,7 @@ block content %}
             <th>Actions</th>
           </tr>
         </thead>
+
         <tbody>
           {% if polls|length > 0 %} {% for poll in polls %}
           <tr>
@@ -85,40 +85,43 @@ block content %}
               <span class="badge bg-danger">Closed</span>
               {% endif %}
             </td>
-            <td>{{ poll.start_date.strftime('%B %d, %Y') | e }}</td>
-            <td>{{ poll.end_date.strftime('%B %d, %Y') | e }}</td>
+
+            <td>{{ poll.start_date.strftime('%B %d, %Y') }}</td>
+            <td>{{ poll.end_date.strftime('%B %d, %Y') }}</td>
 
             <td>
-                <form
-                  action="{{ url_for('routes.delete_poll', poll_id=poll.id) }}"
-                  method="POST"
-                  style="display: inline"
-                >
-                  {{ csrf_token() }}
-                  <button
-                    type="submit"
-                    class="btn btn-danger btn-sm"
-                    onclick="return confirm('Are you sure?');"
-                  >
-                    <i class="fa fa-trash"></i> Delete
-                  </button>
-                </form>
-
+              <!-- Results -->
+              <a
+                href="{{ url_for('routes.results', poll_id=poll.id) }}"
+                class="btn btn-info btn-sm"
+              >
                 <i class="fa fa-bar-chart"></i> Results
               </a>
+
+              <!-- Edit -->
               <a
                 href="{{ url_for('routes.edit_poll', poll_id=poll.id) }}"
                 class="btn btn-warning btn-sm"
               >
                 <i class="fa fa-edit"></i> Edit
               </a>
-              <a
-                href="{{ url_for('routes.delete_poll', poll_id=poll.id) }}"
-                class="btn btn-danger btn-sm"
-                onclick="return confirm('Are you sure you want to delete this poll?');"
+
+              <!-- Delete (POST + CSRF only) -->
+              <form
+                action="{{ url_for('routes.delete_poll', poll_id=poll.id) }}"
+                method="POST"
+                style="display: inline"
+                onsubmit="return confirm('Are you sure you want to delete this poll?');"
               >
-                <i class="fa fa-trash"></i> Delete
-              </a>
+                <input
+                  type="hidden"
+                  name="csrf_token"
+                  value="{{ csrf_token() }}"
+                />
+                <button type="submit" class="btn btn-danger btn-sm">
+                  <i class="fa fa-trash"></i> Delete
+                </button>
+              </form>
             </td>
           </tr>
           {% endfor %} {% else %}

@@ -12,7 +12,10 @@
   <body>
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
       <div class="container-fluid">
-        <a class="navbar-brand" href="/">Voting / Poll Management</a>
+        <a class="navbar-brand" href="{{ url_for('routes.home') }}">
+          Voting / Poll Management
+        </a>
+
         <button
           class="navbar-toggler"
           type="button"
@@ -21,44 +24,53 @@
         >
           <span class="navbar-toggler-icon"></span>
         </button>
+
         <div class="collapse navbar-collapse" id="navbarNav">
-          <ul class="navbar-nav">
-            {% if current_user.is_authenticated %}
+          <ul class="navbar-nav ms-auto">
+            {% if current_user.is_authenticated %} {% if current_user.is_admin
+            %}
             <li class="nav-item">
               <a
-                class="nav-link {% if request.endpoint == 'dashboard' %}active{% endif %}"
-                href="{{ url_for('routes.user_dashboard') }}"
-                >Dashboard</a
+                class="nav-link"
+                href="{{ url_for('routes.admin_dashboard') }}"
               >
-            </li>
-            <li class="nav-item">
-              <a
-                class="nav-link {% if request.endpoint == 'create_poll' %}active{% endif %}"
-                href="{{ url_for('routes.create_poll') }}"
-                >Create Poll</a
-              >
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="{{ url_for('routes.logout') }}"
-                >Logout</a
-              >
+                Admin Dashboard
+              </a>
             </li>
             {% else %}
             <li class="nav-item">
-              <a
-                class="nav-link {% if request.endpoint == 'login' %}active{% endif %}"
-                href="{{ url_for('routes.login') }}"
-                >Login</a
-              >
+              <a class="nav-link" href="{{ url_for('routes.user_dashboard') }}">
+                Dashboard
+              </a>
             </li>
+            {% endif %}
+
+            <li class="nav-item">
+              <a class="nav-link" href="{{ url_for('routes.create_poll') }}">
+                Create Poll
+              </a>
+            </li>
+
             <li class="nav-item">
               <a
-                class="nav-link {% if request.endpoint == 'signup' %}active{% endif %}"
-                href="{{ url_for('routes.signup') }}"
+                class="nav-link text-danger"
+                href="{{ url_for('routes.logout') }}"
+              >
+                Logout
+              </a>
+            </li>
+
+            {% else %} {# SHOW Login / Signup ONLY if NOT on home page #} {% if
+            request.endpoint != 'routes.home' %}
+            <li class="nav-item">
+              <a class="nav-link" href="{{ url_for('routes.login') }}">Login</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="{{ url_for('routes.signup') }}"
                 >Sign Up</a
               >
             </li>
-            {% endif %}
+            {% endif %} {% endif %}
           </ul>
         </div>
       </div>

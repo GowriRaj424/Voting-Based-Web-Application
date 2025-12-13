@@ -6,7 +6,7 @@
 <h2>Edit Poll: {{ poll.title }}</h2>
 
 <form action="{{ url_for('routes.edit_poll', poll_id=poll.id) }}" method="POST"  autocomplete="off">
-    {{ csrf_token() }}
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
     <div class="mb-3">
         <label for="title" class="form-label">Poll Title</label>
         <input type="text" class="form-control" id="title" name="title"value="{{ poll.title }}" required maxlength="100">

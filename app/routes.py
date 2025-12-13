@@ -4,28 +4,27 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 from datetime import datetime
 import re
+from functools import wraps
 
 from app import db
 from app.models import User, Poll, Option, Vote
 
 bp = Blueprint('routes', __name__)
 
-# ------------------------
 # ADMIN DECORATOR
-# ------------------------
 def admin_required(func):
+    @wraps(func)
     def wrapper(*args, **kwargs):
-        if not current_user.is_authenticated or not current_user.is_admin:
-            flash("You do not have permission to access this page.", "danger")
-            return redirect(url_for('routes.user_dashboard'))
+        if not current_user.is_authenticated:
+            abort(401)   # Unauthorized
+
+        if not current_user.is_admin:
+            abort(403)   # Forbidden
+
         return func(*args, **kwargs)
-    wrapper.__name__ = func.__name__
     return wrapper
 
-
-# ------------------------
 # HELPERS
-# ------------------------
 def sanitize_text(value):
     return re.sub(r'<.*?>', '', value).strip()
 
@@ -33,20 +32,18 @@ def validate_email(email):
     return "@" in email and "." in email
 
 def validate_ssn(ssn):
-    return re.match(r"^\d{3}-\d{2}-\d{4}$", ssn)
+    if not ssn:
+        return False
+    ssn = ssn.strip()
+    return bool(re.fullmatch(r"\d{3}-\d{2}-\d{4}", ssn))
 
 
-# ------------------------
 # HOME
-# ------------------------
 @bp.route('/')
 def home():
     return render_template('index.html')
 
-
-# ------------------------
 # SIGNUP
-# ------------------------
 @bp.route('/signup', methods=['GET', 'POST'])
 def signup():
     if request.method == 'POST':
@@ -87,9 +84,7 @@ def signup():
     return render_template('signup.html')
 
 
-# ------------------------
 # LOGIN
-# ------------------------
 @bp.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
@@ -112,9 +107,7 @@ def login():
     return render_template('login.html')
 
 
-# ------------------------
 # LOGOUT
-# ------------------------
 @bp.route('/logout')
 @login_required
 def logout():
@@ -123,9 +116,7 @@ def logout():
     return redirect(url_for('routes.login'))
 
 
-# ------------------------
 # USER DASHBOARD
-# ------------------------
 @bp.route('/user_dashboard')
 @login_required
 def user_dashboard():
@@ -142,10 +133,7 @@ def user_dashboard():
         user_votes_count=len(current_user.votes)
     )
 
-
-# ------------------------
 # ADMIN DASHBOARD
-# ------------------------
 @bp.route('/admin_dashboard')
 @login_required
 @admin_required
@@ -161,51 +149,45 @@ def admin_dashboard():
     )
 
 
-# ------------------------
 # CREATE POLL
-# ------------------------
-@bp.route('/create_poll', methods=['GET', 'POST'])
+@bp.route("/create_poll", methods=["GET", "POST"])
 @login_required
 @admin_required
 def create_poll():
-    if request.method == 'POST':
-        title = sanitize_text(request.form.get('title'))
-        status = request.form.get('status')
-        options = request.form.get('options').split(',')
 
-        start_date = datetime.strptime(request.form.get('start_date'), '%Y-%m-%d')
-        end_date = datetime.strptime(request.form.get('end_date'), '%Y-%m-%d')
+    if request.method == "GET":
+        return render_template("create_poll.html")
 
-        if start_date >= end_date:
-            flash("Invalid poll dates.", "danger")
-            return redirect(url_for('routes.create_poll'))
+    # POST logic
+    title = request.form.get("title", "").strip()
+    start_date = request.form.get("start_date")
+    end_date = request.form.get("end_date")
+    status = request.form.get("status")
+    options_raw = request.form.get("options", "")
 
-        poll = Poll(
-            title=title,
-            start_date=start_date,
-            end_date=end_date,
-            status=status,
-            user_id=current_user.id
-        )
+    options_list = [opt.strip() for opt in options_raw.split(",") if opt.strip()]
 
-        db.session.add(poll)
-        db.session.commit()
+    poll = Poll(
+        user_id=current_user.id,
+        title=title,
+        start_date=datetime.strptime(start_date, "%Y-%m-%d"),
+        end_date=datetime.strptime(end_date, "%Y-%m-%d"),
+        status=status
+    )
 
-        for opt in options:
-            clean = sanitize_text(opt)
-            if clean:
-                db.session.add(Option(option=clean, poll_id=poll.id))
+    db.session.add(poll)
+    db.session.commit()
 
-        db.session.commit()
-        flash("Poll created successfully.", "success")
-        return redirect(url_for('routes.admin_dashboard'))
+    for opt_text in options_list:
+        option = Option(option=opt_text, poll_id=poll.id)
+        db.session.add(option)
 
-    return render_template('create_poll.html')
+    db.session.commit()
+    flash("Poll created successfully", "success")
 
+    return redirect(url_for("routes.admin_dashboard"))
 
-# ------------------------
 # EDIT POLL
-# ------------------------
 @bp.route('/edit_poll/<int:poll_id>', methods=['GET', 'POST'])
 @login_required
 @admin_required
@@ -228,9 +210,7 @@ def edit_poll(poll_id):
     return render_template('edit_poll.html', poll=poll)
 
 
-# ------------------------
 # DELETE POLL (POST ONLY)
-# ------------------------
 @bp.route('/delete_poll/<int:poll_id>', methods=['POST'])
 @login_required
 @admin_required
@@ -246,9 +226,7 @@ def delete_poll(poll_id):
     return redirect(url_for('routes.admin_dashboard'))
 
 
-# ------------------------
 # VOTE
-# ------------------------
 @bp.route('/vote/<int:poll_id>', methods=['GET', 'POST'])
 @login_required
 def vote(poll_id):
@@ -273,9 +251,7 @@ def vote(poll_id):
     return render_template('vote.html', poll=poll, options=options)
 
 
-# ------------------------
 # RESULTS
-# ------------------------
 @bp.route('/results/<int:poll_id>')
 @login_required
 def results(poll_id):
