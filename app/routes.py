@@ -272,22 +272,50 @@ def vote(poll_id):
 def results(poll_id):
     poll = Poll.query.get_or_404(poll_id)
 
+    # Only admin OR users after poll is closed
     if poll.status != 'closed' and not current_user.is_admin:
         return redirect(url_for('routes.user_dashboard'))
 
-    results = (
-        db.session.query(Option.option, db.func.count(Vote.id))
-        .join(Vote)
+    raw_results = (
+        db.session.query(
+            Option.option.label("candidate_name"),
+            db.func.count(Vote.id).label("total_votes")
+        )
+        .join(Vote, Vote.option_id == Option.id)
         .filter(Vote.poll_id == poll.id)
         .group_by(Option.option)
         .all()
     )
 
+    # Convert to safe structure
+    results = []
+    for row in raw_results:
+        results.append({
+            "candidate_name": row.candidate_name,
+            "total_votes": row.total_votes,
+            "live_votes": row.total_votes,
+            "poll_end_time": poll.end_date
+        })
+
+    # 🏆 Determine winner safely
+    if results:
+        winner = max(results, key=lambda x: x["total_votes"])
+        winning_candidate = winner["candidate_name"]
+        winning_votes = winner["total_votes"]
+    else:
+        winning_candidate = "N/A"
+        winning_votes = 0
+
     return render_template(
-        'results.html',
+        "results.html",
         poll=poll,
         results=results,
-        total_votes=len(poll.votes),
+        total_votes=sum(r["total_votes"] for r in results),
         active_users=User.query.filter_by(active=True).count(),
-        chart_data=[{"name": o, "value": c} for o, c in results]
+        winning_candidate=winning_candidate,
+        winning_votes=winning_votes,
+        chart_data=[
+            {"name": r["candidate_name"], "value": r["total_votes"]}
+            for r in results
+        ]
     )
