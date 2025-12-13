@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, redirect, url_for, flash, abort
+from flask import Blueprint, render_template, request, redirect, url_for, flash, abort, session
 from flask_login import login_user, login_required, logout_user, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
@@ -17,12 +17,6 @@ def admin_required(func):
         return func(*args, **kwargs)
     wrapper.__name__ = func.__name__
     return wrapper
-
-def validate_form_csrf():
-    token = request.form.get('csrf_token')
-    if not token or token != session.get('csrf_token'):
-        abort(403)
-
 
 def sanitize_text(value):
     return re.sub(r'<.*?>', '', value).strip()
@@ -192,10 +186,16 @@ def admin_dashboard():
         "active_polls": Poll.query.filter_by(status='active').count(),
         "total_users": User.query.count(),
     }
-    return render_template('admin_dashboard.html', polls=polls, summary=summary)
+    return render_template(
+    'admin_dashboard.html',
+    polls=polls,
+    total_polls=summary["total_polls"],
+    active_polls=summary["active_polls"],
+    total_users=summary["total_users"]
+)
 
 
-@bp.route('/delete_poll/<int:poll_id>')
+@bp.route('/delete_poll/<int:poll_id>', methods=['POST'])
 @login_required
 @admin_required
 def delete_poll(poll_id):
