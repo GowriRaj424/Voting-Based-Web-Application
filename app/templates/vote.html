@@ -1,31 +1,67 @@
-{% extends "base.html" %} {% block title %}Vote for Poll - {{ poll.title }}{%
-endblock %} {% block content %}
-<h2>{{ poll.title }}</h2>
+{% extends "base.html" %} {% block title %}Vote – {{ poll.title }}{% endblock %}
+{% block content %}
 
-<p>Vote for one of the following options:</p>
-<form
-  action="{{ url_for('routes.vote', poll_id=poll.id) }}"
-  method="POST"
-  autocomplete="off"
->
-  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+<style>
+  .vote-container {
+    max-width: 600px;
+    margin: 40px auto;
+  }
 
-  {% for option in options %}
-  <div class="form-check">
-    <input
-      class="form-check-input"
-      type="radio"
-      name="option"
-      id="option{{ option.id }}"
-      value="{{ option.id }}"
-      required
-    />
-    <label class="form-check-label" for="option{{ option.id }}">
-      {{ option.option | e }}
-    </label>
+  .vote-card {
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  }
+
+  .option-box {
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    cursor: pointer;
+  }
+
+  .option-box:hover {
+    background-color: #f8f9fa;
+  }
+</style>
+
+<div class="vote-container">
+  <div class="card vote-card">
+    <h2 class="text-center mb-3">{{ poll.title }}</h2>
+    <p class="text-center text-muted mb-4">
+      Please select <strong>one option</strong> and submit your vote.
+    </p>
+
+    <form method="POST" action="{{ url_for('routes.vote', poll_id=poll.id) }}">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+
+      {% for option in options %}
+      <label class="option-box d-flex align-items-center">
+        <input
+          type="radio"
+          name="option"
+          value="{{ option.id }}"
+          class="form-check-input me-3"
+          required
+        />
+        <span>{{ option.option | e }}</span>
+      </label>
+      {% endfor %}
+
+      <div class="d-grid mt-4">
+        <button type="submit" class="btn btn-primary btn-lg">
+          <i class="fas fa-check-circle"></i> Submit Vote
+        </button>
+      </div>
+    </form>
+
+    <div class="text-center mt-3">
+      <a href="{{ url_for('routes.user_dashboard') }}" class="text-muted">
+        ← Back to Dashboard
+      </a>
+    </div>
   </div>
-  {% endfor %}
-  <br />
-  <button type="submit" class="btn btn-primary">Submit Vote</button>
-</form>
+</div>
+
 {% endblock %}

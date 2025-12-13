@@ -231,25 +231,40 @@ def delete_poll(poll_id):
 @login_required
 def vote(poll_id):
     poll = Poll.query.get_or_404(poll_id)
+
     options = Option.query.filter_by(poll_id=poll.id).all()
 
     if request.method == 'POST':
-        if Vote.query.filter_by(user_id=current_user.id, poll_id=poll.id).first():
-            flash("You already voted.", "danger")
+        # 🔒 check ONLY on submit
+        existing_vote = Vote.query.filter_by(
+            user_id=current_user.id,
+            poll_id=poll.id
+        ).first()
+
+        if existing_vote:
+            flash("You have already voted in this poll.", "warning")
             return redirect(url_for('routes.user_dashboard'))
 
-        vote = Vote(
-            user_id=current_user.id,
-            poll_id=poll.id,
-            option_id=request.form.get('option')
+        option_id = request.form.get('option')
+
+        if not option_id:
+            flash("Please select an option.", "danger")
+            return redirect(url_for('routes.vote', poll_id=poll.id))
+
+        db.session.add(
+            Vote(
+                user_id=current_user.id,
+                poll_id=poll.id,
+                option_id=option_id
+            )
         )
-        db.session.add(vote)
         db.session.commit()
-        flash("Vote submitted.", "success")
+
+        flash("Your vote has been submitted successfully!", "success")
         return redirect(url_for('routes.user_dashboard'))
 
+    # ✅ GET request ALWAYS renders vote page
     return render_template('vote.html', poll=poll, options=options)
-
 
 # RESULTS
 @bp.route('/results/<int:poll_id>')
